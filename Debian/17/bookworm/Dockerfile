@@ -66,6 +66,15 @@ RUN set -xe; \
 	; \
 	rm -rf /var/lib/apt/lists/*;
 
+# Install pg_stat_monitor
+RUN apt-get update; \
+         apt-get install -y build-essential make curl git postgresql-contrib libpq-dev "postgresql-server-dev-$PG_MAJOR"; \
+         git clone https://github.com/percona/pg_stat_monitor.git; \
+         cd pg_stat_monitor; \
+         make USE_PGXS=1; \
+         make USE_PGXS=1 install; \
+         apt-get purge build-essential make curl git postgresql-contrib libpq-dev "postgresql-server-dev-$PG_MAJOR" -y --auto-remove
+
 # Change the uid of postgres to 26
 RUN usermod -u 26 postgres
 USER 26
