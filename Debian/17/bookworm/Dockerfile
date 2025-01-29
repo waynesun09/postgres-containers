@@ -14,17 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM postgres:17.0-bookworm
+FROM postgres:17.2-bookworm
 
 # Do not split the description, otherwise we will see a blank space in the labels
 LABEL name="PostgreSQL Container Images" \
       vendor="The CloudNativePG Contributors" \
       version="${PG_VERSION}" \
-      release="28" \
+      release="33" \
       summary="PostgreSQL Container images." \
-      description="This Docker image contains PostgreSQL and Barman Cloud based on Postgres 17.0-bookworm."
+      description="This Docker image contains PostgreSQL and Barman Cloud based on Postgres 17.2-bookworm."
 
-LABEL org.opencontainers.image.description="This Docker image contains PostgreSQL and Barman Cloud based on Postgres 17.0-bookworm."
+LABEL org.opencontainers.image.description="This Docker image contains PostgreSQL and Barman Cloud based on Postgres 17.2-bookworm."
 
 COPY requirements.txt /
 
@@ -43,11 +43,6 @@ RUN set -xe; \
 RUN set -xe; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
-		# We require build dependencies to build snappy 0.6
-		# on Python 3.11 or greater.
-		# TODO: Remove build deps once barman unpins the snappy version or
-		# https://github.com/EnterpriseDB/barman/issues/905 is completed
-		build-essential python3-dev libsnappy-dev \
 		python3-pip \
 		python3-psycopg2 \
 		python3-setuptools \
@@ -55,15 +50,6 @@ RUN set -xe; \
 	pip3 install --break-system-packages --upgrade pip; \
 	# TODO: Remove --no-deps once https://github.com/pypa/pip/issues/9644 is solved
 	pip3 install --break-system-packages --no-deps -r requirements.txt; \
-	# We require build dependencies to build snappy 0.6
-	# on Python 3.11 or greater.
-	# TODO: Remove build deps once barman unpins the snappy version or
-	# https://github.com/EnterpriseDB/barman/issues/905 is completed
-	apt-get remove -y --purge --autoremove \
-		build-essential \
-		python3-dev \
-		libsnappy-dev \
-	; \
 	rm -rf /var/lib/apt/lists/*;
 
 # Install pg_stat_monitor
